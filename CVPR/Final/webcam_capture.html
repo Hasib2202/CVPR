@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webcam Capture</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        video {
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h2>Webcam Capture</h2>
+    <input type="text" id="name" placeholder="Enter your name" required />
+    <video id="video" width="640" height="480" autoplay></video>
+    <button id="capture">Capture</button>
+    <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+        const captureButton = document.getElementById('capture');
+        const nameInput = document.getElementById('name');
+
+        // Access the device camera and stream to video element
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+                video.srcObject = stream;
+            })
+            .catch((err) => {
+                console.error("Error accessing webcam: " + err);
+            });
+
+        // Capture the image
+        captureButton.addEventListener('click', () => {
+            const name = nameInput.value.trim();
+            if (name === "") {
+                alert("Please enter your name!");
+                return;
+            }
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageData = canvas.toDataURL('image/jpeg');
+
+            // Create a link to download the captured image
+            const link = document.createElement('a');
+            link.href = imageData;
+            link.download = `${name}.jpg`; // Save as user's name
+            link.click();
+
+            alert("Image captured and saved as " + name + ".jpg");
+        });
+    </script>
+</body>
+</html>
